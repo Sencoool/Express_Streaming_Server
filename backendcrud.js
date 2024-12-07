@@ -323,7 +323,7 @@ app.delete("/movie/:id", (req, res) => {
     });
 });
 
-app.post("/register", async (req, res) => {
+app.post("/register", upload.single(""), async (req, res) => {
   const exist = await User.findOne({ where: { name: req.body.name } });
   if (exist) return res.json({ message: "al" });
   else {
@@ -337,7 +337,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", upload.single(""), async (req, res) => {
   try {
     const { name, password } = req.body;
     const user = await User.findOne({ where: { name } });
@@ -346,7 +346,15 @@ app.post("/login", async (req, res) => {
     if (user.password !== password)
       return res.json({ message: "Wrong_Password" });
 
-    return res.status(200).json({ message: true, user });
+    const payload = {
+      name: user.name,
+      roles: user.roles,
+      profilePicture: user.profilePicture,
+    };
+
+    const token = jwt.sign(payload, JWTkey, { expiresIn: "1h" });
+
+    return res.status(200).json({ message: true, token });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Server_error" });
