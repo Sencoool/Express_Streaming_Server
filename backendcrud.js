@@ -228,6 +228,7 @@ app.post("/movies", upload.single("imageFile"), (req, res) => {
     rating: req.body.rating,
     running_time: req.body.running_time,
     genre: req.body.genre,
+    teaser_url: req.body.teaser_url,
     imageFile: req.file.filename,
   })
     .then((movie) => {
